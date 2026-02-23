@@ -97,6 +97,23 @@ export class PrismaAuthRepository implements AuthRepository {
     orderBy: { createdAt: 'desc' },
   })
 }
-  
+  findAllTasks() {
+  return this.prisma.task.findMany({
+    orderBy: { createdAt: 'desc' },
+  })
+}
+deleteTaskById(taskId: string) {
+  return this.prisma.task.delete({
+    where: { id: taskId },
+  })
+}
+promoteUserToAdmin(userId: string, adminRoleId: string) {
+  return this.prisma.user.update({
+    where: { id: userId },
+    data: {
+      roleId: adminRoleId,
+    },
+  })
+}
 
 }

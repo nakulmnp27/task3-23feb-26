@@ -130,4 +130,31 @@ export class AuthService {
   getMyTasks(userId: string) {
   return this.repo.findTaskByUser(userId)
 }
+
+getAllTasks() {
+  return this.repo.findAllTasks()
+}
+
+deleteTask(taskId: string) {
+  return this.repo.deleteTaskById(taskId)
+}
+
+async promoteToAdmin(userId: string) {
+  const adminRole = await this.repo.findRoleByName('ADMIN')
+
+  if (!adminRole) {
+    throw new BadRequestException('ADMIN role not found')
+  }
+
+  const user = await this.repo.promoteUserToAdmin(userId, adminRole.id)
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    roleId: user.roleId,
+    isActive: user.isActive,
+    updatedAt: user.updatedAt,
+  }
+}
 }
