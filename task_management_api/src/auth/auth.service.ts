@@ -126,4 +126,8 @@ export class AuthService {
       ownerId: userId,
     })
   }
+
+  getMyTasks(userId: string) {
+  return this.repo.findTaskByUser(userId)
+}
 }
