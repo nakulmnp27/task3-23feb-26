@@ -36,5 +36,10 @@ export interface AuthRepository {
   }): Promise<Task>
 
   findTaskByUser(userId:string):Promise<Task[]>
-  
+  findAllTasks(): Promise<Task[]>
+  deleteTaskById(taskId: string): Promise<Task>
+  promoteUserToAdmin(
+  userId: string,
+  adminRoleId: string,
+): Promise<User>
 }

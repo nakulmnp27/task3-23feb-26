@@ -13,17 +13,39 @@ const prisma = new PrismaClient({
 } as any)
 
 async function main() {
-  await prisma.role.upsert({
+  const userRole = await prisma.role.upsert({
     where: { name: 'USER' },
     update: {},
     create: { name: 'USER' },
   })
 
-  await prisma.role.upsert({
+  const adminRole = await prisma.role.upsert({
     where: { name: 'ADMIN' },
     update: {},
     create: { name: 'ADMIN' },
   })
+
+  const adminEmail = 'admin@example.com'
+
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  })
+
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash('Admin@123', 10)
+
+    await prisma.user.create({
+      data: {
+        email: adminEmail,
+        passwordHash,
+        name: 'System Admin',
+        roleId: adminRole.id,
+        isActive: true,
+      },
+    })
+  }
+
+  console.log("Seeding completed broo...")
 }
 
 main()
