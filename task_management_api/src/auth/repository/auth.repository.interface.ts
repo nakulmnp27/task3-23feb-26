@@ -1,7 +1,10 @@
-import { User, Role, RefreshToken } from '@prisma/client'
+import { User, Role, RefreshToken, Task } from '@prisma/client'
 
 export interface AuthRepository {
-  findUserByEmail(email: string): Promise<User | null>
+  findUserByEmail(
+    email: string,
+  ): Promise<(User & { role: Role }) | null>
+
   findRoleByName(name: string): Promise<Role | null>
 
   createUser(data: {
@@ -9,7 +12,7 @@ export interface AuthRepository {
     passwordHash: string
     name?: string
     roleId: string
-  }): Promise<User>
+  }): Promise<User & { role: Role }>
 
   saveRefreshToken(
     userId: string,
@@ -17,12 +20,18 @@ export interface AuthRepository {
     expiresAt: Date,
   ): Promise<RefreshToken>
 
-  findValidRefreshTokenByRawToken(
+  findValidRefreshToken(
     rawToken: string,
-  ): Promise<(RefreshToken & { user: User }) | null>
+  ): Promise<(RefreshToken & { user: User & { role: Role } }) | null>
 
   revokeToken(
     tokenId: string,
     replacedById?: string,
   ): Promise<RefreshToken>
+
+  createTask(data: {
+    title: string
+    description: string
+    ownerId: string
+  }): Promise<Task>
 }

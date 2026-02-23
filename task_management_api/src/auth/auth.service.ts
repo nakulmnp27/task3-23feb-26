@@ -7,6 +7,7 @@ import { PrismaAuthRepository } from './repository/auth.repository'
 import { ConfigService } from '@nestjs/config'
 import * as crypto from 'crypto'
 import { RefreshTokenDto } from './dto/refresh-token.dto'
+import { CreateTaskDto } from './dto/create-task.dto'
 
 @Injectable()
 export class AuthService {
@@ -63,6 +64,7 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
       email: user.email,
+      roles: [user.role.name],
     })
 
     const refreshToken = crypto.randomUUID()
@@ -82,37 +84,46 @@ export class AuthService {
   }
 
   async refresh(dto: RefreshTokenDto) {
-  const existing =
-    await this.repo.findValidRefreshTokenByRawToken(dto.refreshToken)
+    const existing =
+      await this.repo.findValidRefreshToken(dto.refreshToken)
 
-  if (!existing) {
-    throw new UnauthorizedException('Invalid refresh token')
+    if (!existing) {
+      throw new UnauthorizedException('Invalid refresh token')
+    }
+
+    const accessToken = await this.jwtService.signAsync({
+      sub: existing.user.id,
+      email: existing.user.email,
+      roles: [existing.user.role.name],
+    })
+
+    const refreshToken = crypto.randomUUID()
+
+    const refreshDays =
+      Number(this.configService.get('REFRESH_TOKEN_EXPIRES_IN_DAYS')) || 7
+
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + refreshDays)
+
+    const newToken = await this.repo.saveRefreshToken(
+      existing.user.id,
+      refreshToken,
+      expiresAt,
+    )
+
+    await this.repo.revokeToken(existing.id, newToken.id)
+
+    return {
+      accessToken,
+      refreshToken,
+    }
   }
 
-  const accessToken = await this.jwtService.signAsync({
-    sub: existing.user.id,
-    email: existing.user.email,
-  })
-
-  const refreshToken = crypto.randomUUID()
-
-  const refreshDays =
-    Number(this.configService.get('REFRESH_TOKEN_EXPIRES_IN_DAYS')) || 7
-
-  const expiresAt = new Date()
-  expiresAt.setDate(expiresAt.getDate() + refreshDays)
-
-  const newToken = await this.repo.saveRefreshToken(
-    existing.user.id,
-    refreshToken,
-    expiresAt,
-  )
-
-  await this.repo.revokeToken(existing.id, newToken.id)
-
-  return {
-    accessToken,
-    refreshToken,
+  createTask(dto: CreateTaskDto, userId: string) {
+    return this.repo.createTask({
+      title: dto.title,
+      description: dto.description,
+      ownerId: userId,
+    })
   }
-}
 }
