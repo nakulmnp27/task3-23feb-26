@@ -90,4 +90,13 @@ export class PrismaAuthRepository implements AuthRepository {
       },
     })
   }
+
+  findTaskByUser(ownerId: string) {
+  return this.prisma.task.findMany({
+    where: { ownerId },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+  
+
 }

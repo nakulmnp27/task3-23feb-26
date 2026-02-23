@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Get,
   Req,
   UseGuards,
 } from '@nestjs/common'
@@ -43,4 +44,12 @@ export class AuthController {
   createTask(@Body() dto: CreateTaskDto, @Req() req: any) {
     return this.authService.createTask(dto, req.user.userId)
   }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('USER')
+  @Get('tasks')
+  getMyTasks(@Req() req: any) {
+    return this.authService.getMyTasks(req.user.userId)
+}
 }

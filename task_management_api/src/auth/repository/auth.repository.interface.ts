@@ -34,4 +34,7 @@ export interface AuthRepository {
     description: string
     ownerId: string
   }): Promise<Task>
+
+  findTaskByUser(userId:string):Promise<Task[]>
+  
 }
