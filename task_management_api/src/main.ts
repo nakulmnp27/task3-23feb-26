@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common'
+import { ValidationPipe,VersioningType } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
@@ -6,6 +6,10 @@ import { Transport, MicroserviceOptions } from '@nestjs/microservices'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -77,6 +81,8 @@ async function bootstrap() {
   console.log(`Health Check (DB): ${baseUrl}/health/db`)
   console.log(`Swagger UI: ${baseUrl}/docs`)
   console.log(`Swagger JSON: ${baseUrl}/docs-json`)
+  console.log(`GET ${baseUrl}/v1/bikes`)
+  console.log(`GET ${baseUrl}/v2/bikes`)
 }
 
 bootstrap()

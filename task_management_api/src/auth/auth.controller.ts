@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Get,
-  Req,
-  UseGuards,
-  Delete,
-  Param, 
-  Patch
-} from '@nestjs/common'
+import {Body,Controller,Post,Get,Req,UseGuards,Delete,Param,Patch} from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
 import { AuthService } from './auth.service'
@@ -54,28 +44,29 @@ export class AuthController {
   @Get('tasks')
   getMyTasks(@Req() req: any) {
     return this.authService.getMyTasks(req.user.userId)
-}
+  }
+
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get('tasks/all')
   getAllTasks() {
     return this.authService.getAllTasks()
-}
+  }
 
-@ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-@Delete('tasks/:id')
-deleteTask(@Param('id') id: string) {
-  return this.authService.deleteTask(id)
-}
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Delete('tasks/:id')
+  deleteTask(@Param('id') id: string) {
+    return this.authService.deleteTask(id)
+  }
 
-@ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
-@Patch('users/:id/promote')
-promoteUser(@Param('id') id: string) {
-  return this.authService.promoteToAdmin(id)
-}
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch('users/:id/promote')
+  promoteUser(@Param('id') id: string) {
+    return this.authService.promoteToAdmin(id)
+  }
 }
