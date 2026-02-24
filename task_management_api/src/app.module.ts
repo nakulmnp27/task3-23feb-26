@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { NotificationsModule } from './notifications/notifications.module'
+import { BikesModule } from './bikes/bikes.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { NotificationsModule } from './notifications/notifications.module'
     HealthModule,
     AuthModule,
     NotificationsModule,
+    BikesModule
   ],
 })
 export class AppModule {}
