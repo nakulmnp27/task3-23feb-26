@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import * as crypto from 'crypto'
 import { RefreshTokenDto } from './dto/refresh-token.dto'
 import { CreateTaskDto } from './dto/create-task.dto'
+import { RedisClient } from './redis.client'
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,10 @@ export class AuthService {
       passwordHash,
       name: dto.name,
       roleId: role.id,
+    })
+    RedisClient.emit('welcome.email', {
+      userId: user.id,
+      email: user.email,
     })
 
     return {
